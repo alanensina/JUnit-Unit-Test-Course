@@ -5,6 +5,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -68,7 +70,7 @@ public class LocacaoServiceTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void alugarFilme() throws Exception {
+    public void deveAlugarFilme() throws Exception {
         // Iniciando as variáveis
         Usuario usuario = new Usuario("Alan");
         Filme filme1 = new Filme("Vanilla Sky", 1, 6.75);
@@ -84,8 +86,8 @@ public class LocacaoServiceTest {
         Locacao locacao = service.alugarFilme(usuario, filmes);
 
         // Verificação com assertEquals e assertThat(deprecated)
-        assertEquals(27, locacao.getValor(), 0.01);
-        assertThat(locacao.getValor(), CoreMatchers.is(CoreMatchers.equalTo(27.0)));
+        assertEquals(21.94, locacao.getValor(), 0.01);
+        assertThat(locacao.getValor(), CoreMatchers.is(CoreMatchers.equalTo(21.94)));
         assertThat(locacao.getValor(), CoreMatchers.is(CoreMatchers.not(25.0)));
         assertTrue(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()));
         assertTrue(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)));
@@ -93,14 +95,14 @@ public class LocacaoServiceTest {
         assertThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)), CoreMatchers.is(true));
 
         // Error collector, verificará casos de erros nas assertivas:
-        error.checkThat(locacao.getValor(), CoreMatchers.is(CoreMatchers.equalTo(27.0)));
+        error.checkThat(locacao.getValor(), CoreMatchers.is(CoreMatchers.equalTo(21.94)));
         error.checkThat(locacao.getValor(), CoreMatchers.is(CoreMatchers.not(25.0)));
         error.checkThat(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()), CoreMatchers.is(true));
         error.checkThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)), CoreMatchers.is(true));
     }
 
     @Test(expected = FilmesSemEstoqueException.class) // Recomendado para exceções criadas
-    public void alugarFilmeSemEstoque() throws Exception {
+    public void deveLancarExcecaoAoAlugarFilmeSemEstoque() throws Exception {
         // Iniciando as variáveis
         Usuario usuario = new Usuario("Alan");
         Filme filme = new Filme("Vanilla Sky", 0, 6.75);
@@ -112,7 +114,7 @@ public class LocacaoServiceTest {
 
     @Ignore // Teste ignorado pois agora está lançando uma exceção específica e não valida mais por mensagem retornada
     @Test
-    public void alugarFilmeSemEstoque_v2() {
+    public void deveLancarFailAoAlugarFilmeSemEstoque() {
         // Iniciando as variáveis
         Usuario usuario = new Usuario("Alan");
         Filme filme = new Filme("Vanilla Sky", 0, 6.75);
@@ -129,7 +131,7 @@ public class LocacaoServiceTest {
 
     @Ignore // Teste ignorado pois agora está lançando uma exceção específica e não valida mais por mensagem retornada
     @Test
-    public void alugarFilmeSemEstoque_v3() throws Exception {
+    public void deveLancarExcecaoAoAlugarFilmeSemEstoque_v2() throws Exception {
         // Iniciando as variáveis
         Usuario usuario = new Usuario("Alan");
         Filme filme = new Filme("Vanilla Sky", 0, 6.75);
@@ -142,7 +144,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void usuarioVazio() throws FilmesSemEstoqueException {
+    public void naoDeveAlugarSemUsuario() throws FilmesSemEstoqueException {
         Filme filme = new Filme("Vanilla Sky", 1, 6.75);
         filmes.add(filme);
 
@@ -156,7 +158,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void filmeVazio() throws FilmesSemEstoqueException, LocadoraException {
+    public void naoDeveAlugarSeAListaDeFilmesEstiverVazia() throws FilmesSemEstoqueException, LocadoraException {
         // Iniciando as variáveis
         Usuario usuario = new Usuario("Alan");
         exception.expect(LocadoraException.class);
@@ -165,4 +167,95 @@ public class LocacaoServiceTest {
         // Ação
         service.alugarFilme(usuario, null);
     }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    public void devePagar75pctNoFilme3() throws FilmesSemEstoqueException, LocadoraException {
+        // cenário
+        Usuario usuario = new Usuario("Alan");
+        List<Filme> filmes = Arrays.asList(
+                new Filme("Filme 1", 2, 4.0),
+                new Filme("Filme 2", 2, 4.0),
+                new Filme("Filme 3", 2, 4.0));
+
+        // ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+        // verificação
+        assertThat(locacao.getValor(), CoreMatchers.is(11.0));
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    public void devePagar50pctNoFilme4() throws FilmesSemEstoqueException, LocadoraException {
+        // cenário
+        Usuario usuario = new Usuario("Alan");
+        List<Filme> filmes = Arrays.asList(
+                new Filme("Filme 1", 2, 4.0),
+                new Filme("Filme 2", 2, 4.0),
+                new Filme("Filme 3", 2, 4.0),
+                new Filme("Filme 4", 2, 4.0));
+
+        // ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+        // verificação
+        assertThat(locacao.getValor(), CoreMatchers.is(13.0));
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    public void devePagar25pctNoFilme5() throws FilmesSemEstoqueException, LocadoraException {
+        // cenário
+        Usuario usuario = new Usuario("Alan");
+        List<Filme> filmes = Arrays.asList(
+                new Filme("Filme 1", 2, 4.0),
+                new Filme("Filme 2", 2, 4.0),
+                new Filme("Filme 3", 2, 4.0),
+                new Filme("Filme 4", 2, 4.0),
+                new Filme("Filme 5", 2, 4.0));
+
+        // ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+        // verificação
+        assertThat(locacao.getValor(), CoreMatchers.is(14.0));
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    public void devePagar0pctNoFilme6() throws FilmesSemEstoqueException, LocadoraException {
+        // cenário
+        Usuario usuario = new Usuario("Alan");
+        List<Filme> filmes = Arrays.asList(
+                new Filme("Filme 1", 2, 4.0),
+                new Filme("Filme 2", 2, 4.0),
+                new Filme("Filme 3", 2, 4.0),
+                new Filme("Filme 4", 2, 4.0),
+                new Filme("Filme 5", 2, 4.0),
+                new Filme("Filme 6", 2, 4.0));
+
+        // ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+        // verificação
+        assertThat(locacao.getValor(), CoreMatchers.is(14.0));
+    }
+
+    @Test
+    public void deveDevolverNaSegundaAoAlugarNoSabado() throws FilmesSemEstoqueException, LocadoraException {
+
+        // cenario
+        Usuario usuario = new Usuario("Alan");
+        List<Filme> filmes = Arrays.asList(
+                new Filme("Filme 1", 2, 4.0));
+
+        // ação
+        Locacao locacao = service.alugarFilme(usuario, filmes);
+
+        // verificação
+        boolean ehSegunda = DataUtils.verificarDiaSemana(locacao.getDataRetorno(), Calendar.MONDAY);
+        assertTrue(ehSegunda);
+    }
+
 }
