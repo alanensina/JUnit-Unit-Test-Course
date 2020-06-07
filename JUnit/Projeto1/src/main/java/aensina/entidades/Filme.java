@@ -38,4 +38,9 @@ public class Filme {
     public void setPrecoLocacao(Double precoLocacao) {
         this.precoLocacao = precoLocacao;
     }
+
+	@Override
+	public String toString() {
+		return getNome();
+	}
 }

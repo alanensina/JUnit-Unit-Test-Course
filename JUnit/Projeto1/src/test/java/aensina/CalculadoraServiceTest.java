@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import aensina.servicos.CalculadoraService;
-import exceptions.NaoPodeDividirPorZeroException;
+import aensina.exceptions.NaoPodeDividirPorZeroException;
 
 public class CalculadoraServiceTest {
 

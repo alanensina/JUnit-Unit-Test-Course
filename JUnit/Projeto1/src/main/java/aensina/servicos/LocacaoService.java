@@ -12,8 +12,8 @@ import aensina.entidades.Filme;
 import aensina.entidades.Locacao;
 import aensina.entidades.Usuario;
 import aensina.utils.DataUtils;
-import exceptions.FilmesSemEstoqueException;
-import exceptions.LocadoraException;
+import aensina.exceptions.FilmesSemEstoqueException;
+import aensina.exceptions.LocadoraException;
 
 public class LocacaoService {
 

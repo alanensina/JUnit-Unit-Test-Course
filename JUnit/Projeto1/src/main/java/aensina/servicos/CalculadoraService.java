@@ -1,6 +1,6 @@
 package aensina.servicos;
 
-import exceptions.NaoPodeDividirPorZeroException;
+import aensina.exceptions.NaoPodeDividirPorZeroException;
 
 public class CalculadoraService {
 

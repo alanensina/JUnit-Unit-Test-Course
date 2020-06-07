@@ -1,4 +1,4 @@
-package exceptions;
+package aensina.exceptions;
 
 public class LocadoraException extends Exception {
 
