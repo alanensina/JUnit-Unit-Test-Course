@@ -26,10 +26,11 @@ import org.junit.rules.ExpectedException;
 import aensina.entidades.Filme;
 import aensina.entidades.Locacao;
 import aensina.entidades.Usuario;
-import aensina.servicos.LocacaoService;
-import aensina.utils.DataUtils;
 import aensina.exceptions.FilmesSemEstoqueException;
 import aensina.exceptions.LocadoraException;
+import aensina.servicos.LocacaoService;
+import aensina.utils.DataUtils;
+import matchers.MatchersProperties;
 
 public class LocacaoServiceTest {
 
@@ -72,8 +73,8 @@ public class LocacaoServiceTest {
     @SuppressWarnings("deprecation")
     @Test
     public void deveAlugarFilme() throws Exception {
-    	
-    	Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
+
+        Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
         // Iniciando as variáveis
         Usuario usuario = new Usuario("Alan");
         Filme filme1 = new Filme("Vanilla Sky", 1, 6.75);
@@ -95,7 +96,9 @@ public class LocacaoServiceTest {
         assertTrue(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()));
         assertTrue(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)));
         assertThat(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()), CoreMatchers.is(true));
+        assertThat(locacao.getDataLocacao(), MatchersProperties.ehHoje());
         assertThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)), CoreMatchers.is(true));
+        assertThat(locacao.getDataRetorno(), MatchersProperties.ehHojeComDiferencaDeDias(1));
 
         // Error collector, verificará casos de erros nas assertivas:
         error.checkThat(locacao.getValor(), CoreMatchers.is(CoreMatchers.equalTo(21.94)));
@@ -171,11 +174,12 @@ public class LocacaoServiceTest {
         service.alugarFilme(usuario, null);
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void deveDevolverNaSegundaAoAlugarNoSabado() throws FilmesSemEstoqueException, LocadoraException {
 
-    	Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
-    	
+        Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
+
         // cenario
         Usuario usuario = new Usuario("Alan");
         List<Filme> filmes = Arrays.asList(
@@ -187,6 +191,10 @@ public class LocacaoServiceTest {
         // verificação
         boolean ehSegunda = DataUtils.verificarDiaSemana(locacao.getDataRetorno(), Calendar.MONDAY);
         assertTrue(ehSegunda);
+
+        assertThat(locacao.getDataRetorno(), MatchersProperties.caiEm(Calendar.MONDAY));
+        assertThat(locacao.getDataRetorno(), MatchersProperties.caiEmUmaSegunda());
+
     }
 
 }
