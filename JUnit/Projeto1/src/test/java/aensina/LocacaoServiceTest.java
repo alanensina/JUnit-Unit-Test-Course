@@ -30,6 +30,9 @@ import aensina.exceptions.FilmesSemEstoqueException;
 import aensina.exceptions.LocadoraException;
 import aensina.servicos.LocacaoService;
 import aensina.utils.DataUtils;
+import buildermaster.BuilderMaster;
+import builders.FilmeBuilder;
+import builders.UsuarioBuilder;
 import matchers.MatchersProperties;
 
 public class LocacaoServiceTest {
@@ -76,7 +79,7 @@ public class LocacaoServiceTest {
 
         Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
         // Iniciando as variáveis
-        Usuario usuario = new Usuario("Alan");
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
         Filme filme1 = new Filme("Vanilla Sky", 1, 6.75);
         Filme filme2 = new Filme("Senhor dos Anéis - A Sociedade do Anel", 1, 6.75);
         Filme filme3 = new Filme("Star Wars - Episódio IV", 1, 6.75);
@@ -110,8 +113,8 @@ public class LocacaoServiceTest {
     @Test(expected = FilmesSemEstoqueException.class) // Recomendado para exceções criadas
     public void deveLancarExcecaoAoAlugarFilmeSemEstoque() throws Exception {
         // Iniciando as variáveis
-        Usuario usuario = new Usuario("Alan");
-        Filme filme = new Filme("Vanilla Sky", 0, 6.75);
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
+        Filme filme = FilmeBuilder.umFilme().semEstoque().agora();
         filmes.add(filme);
 
         // Ação
@@ -122,8 +125,8 @@ public class LocacaoServiceTest {
     @Test
     public void deveLancarFailAoAlugarFilmeSemEstoque() {
         // Iniciando as variáveis
-        Usuario usuario = new Usuario("Alan");
-        Filme filme = new Filme("Vanilla Sky", 0, 6.75);
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
+        Filme filme = FilmeBuilder.umFilmeSemEstoque().agora();
         filmes.add(filme);
 
         // Ação
@@ -139,8 +142,8 @@ public class LocacaoServiceTest {
     @Test
     public void deveLancarExcecaoAoAlugarFilmeSemEstoque_v2() throws Exception {
         // Iniciando as variáveis
-        Usuario usuario = new Usuario("Alan");
-        Filme filme = new Filme("Vanilla Sky", 0, 6.75);
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
+        Filme filme = FilmeBuilder.umFilme().semEstoque().agora();
         filmes.add(filme);
         exception.expect(Exception.class);
         exception.expectMessage("Filme indisponível no estoque.");
@@ -151,7 +154,7 @@ public class LocacaoServiceTest {
 
     @Test
     public void naoDeveAlugarSemUsuario() throws FilmesSemEstoqueException {
-        Filme filme = new Filme("Vanilla Sky", 1, 6.75);
+        Filme filme = FilmeBuilder.umFilme().agora();
         filmes.add(filme);
 
         // Ação
@@ -166,7 +169,7 @@ public class LocacaoServiceTest {
     @Test
     public void naoDeveAlugarSeAListaDeFilmesEstiverVazia() throws FilmesSemEstoqueException, LocadoraException {
         // Iniciando as variáveis
-        Usuario usuario = new Usuario("Alan");
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
         exception.expect(LocadoraException.class);
         exception.expectMessage("Filme vazio");
 
@@ -181,9 +184,8 @@ public class LocacaoServiceTest {
         Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
 
         // cenario
-        Usuario usuario = new Usuario("Alan");
-        List<Filme> filmes = Arrays.asList(
-                new Filme("Filme 1", 2, 4.0));
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
+        List<Filme> filmes = Arrays.asList(FilmeBuilder.umFilme().agora());
 
         // ação
         Locacao locacao = service.alugarFilme(usuario, filmes);
@@ -195,6 +197,12 @@ public class LocacaoServiceTest {
         assertThat(locacao.getDataRetorno(), MatchersProperties.caiEm(Calendar.MONDAY));
         assertThat(locacao.getDataRetorno(), MatchersProperties.caiEmUmaSegunda());
 
+    }
+
+    // Foi importado um jar do BuilderMaster
+    // Rodar como Java aplication e pegar no console o builder do Locacao
+    public static void main(String[] args) {
+        new BuilderMaster().gerarCodigoClasse(Locacao.class);
     }
 
 }
