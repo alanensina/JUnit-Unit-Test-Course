@@ -22,7 +22,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
 
+import aensina.dao.LocacaoDAO;
 import aensina.entidades.Filme;
 import aensina.entidades.Locacao;
 import aensina.entidades.Usuario;
@@ -55,7 +57,8 @@ public class LocacaoServiceTest {
         // System.out.println("Before");
         // contadorDeTestes++;
         // System.out.println("Contador: " + contadorDeTestes);
-
+        LocacaoDAO dao = Mockito.mock(LocacaoDAO.class);
+        service.setLocacaoDAO(dao);
     }
 
     @After

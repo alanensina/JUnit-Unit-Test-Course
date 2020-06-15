@@ -8,19 +8,22 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import aensina.dao.LocacaoDAO;
 import aensina.entidades.Filme;
 import aensina.entidades.Locacao;
 import aensina.entidades.Usuario;
-import aensina.utils.DataUtils;
 import aensina.exceptions.FilmesSemEstoqueException;
 import aensina.exceptions.LocadoraException;
+import aensina.utils.DataUtils;
 
 public class LocacaoService {
 
     /*
-     * public String vPublica; // Variável é vista na classe de pois está no mesmo pacote protected String vProtegida; // Variável é vista na classe de teste pois está no mesmo pacote private String vPrivada; // Não é possível visualizar
-     * fora desta classe String vDefault; // Variável é vista na classe de teste pois está no mesmo pacote
+     * public String vPublica; // Variável é vista na classe de pois está no mesmo pacote protected String vProtegida; // Variável é vista na classe de teste pois está no mesmo pacote private String
+     * vPrivada; // Não é possível visualizar fora desta classe String vDefault; // Variável é vista na classe de teste pois está no mesmo pacote
      */
+
+    private LocacaoDAO dao;
 
     public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws FilmesSemEstoqueException, LocadoraException {
 
@@ -49,7 +52,7 @@ public class LocacaoService {
         locacao.setDataRetorno(dataEntrega);
 
         // Salvando a locacao...
-        // TODO adicionar método para salvar
+        dao.salvar(locacao);
 
         return locacao;
     }
@@ -99,5 +102,9 @@ public class LocacaoService {
         BigDecimal bd = new BigDecimal(valor).setScale(casasDecimais, RoundingMode.HALF_EVEN);
 
         return Double.parseDouble(bd.toString());
+    }
+
+    public void setLocacaoDAO(LocacaoDAO dao) {
+        this.dao = dao;
     }
 }
