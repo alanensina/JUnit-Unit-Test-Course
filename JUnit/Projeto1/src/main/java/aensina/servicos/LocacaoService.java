@@ -14,6 +14,7 @@ import aensina.entidades.Locacao;
 import aensina.entidades.Usuario;
 import aensina.exceptions.FilmesSemEstoqueException;
 import aensina.exceptions.LocadoraException;
+import aensina.interfaces.SPCInterface;
 import aensina.utils.DataUtils;
 
 public class LocacaoService {
@@ -24,6 +25,7 @@ public class LocacaoService {
      */
 
     private LocacaoDAO dao;
+    private SPCInterface spc;
 
     public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws FilmesSemEstoqueException, LocadoraException {
 
@@ -33,6 +35,10 @@ public class LocacaoService {
 
         else if (filmes == null || filmes.isEmpty()) {
             throw new LocadoraException("Filme vazio");
+        }
+
+        else if (spc.possuiSaldoNegativo(usuario)) {
+            throw new LocadoraException("Usuário devedor");
         }
 
         Locacao locacao = new Locacao();
@@ -106,5 +112,9 @@ public class LocacaoService {
 
     public void setLocacaoDAO(LocacaoDAO dao) {
         this.dao = dao;
+    }
+
+    public void setSPC(SPCInterface spc) {
+        this.spc = spc;
     }
 }

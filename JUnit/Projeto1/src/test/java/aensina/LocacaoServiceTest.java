@@ -30,9 +30,9 @@ import aensina.entidades.Locacao;
 import aensina.entidades.Usuario;
 import aensina.exceptions.FilmesSemEstoqueException;
 import aensina.exceptions.LocadoraException;
+import aensina.interfaces.SPCInterface;
 import aensina.servicos.LocacaoService;
 import aensina.utils.DataUtils;
-import buildermaster.BuilderMaster;
 import builders.FilmeBuilder;
 import builders.UsuarioBuilder;
 import matchers.MatchersProperties;
@@ -41,6 +41,7 @@ public class LocacaoServiceTest {
 
     private LocacaoService service;
     private List<Filme> filmes;
+    private SPCInterface spc;
     // private static int contadorDeTestes = 0;
 
     @Rule
@@ -59,6 +60,9 @@ public class LocacaoServiceTest {
         // System.out.println("Contador: " + contadorDeTestes);
         LocacaoDAO dao = Mockito.mock(LocacaoDAO.class);
         service.setLocacaoDAO(dao);
+
+        spc = Mockito.mock(SPCInterface.class);
+        service.setSPC(spc);
     }
 
     @After
@@ -204,8 +208,23 @@ public class LocacaoServiceTest {
 
     // Foi importado um jar do BuilderMaster
     // Rodar como Java aplication e pegar no console o builder do Locacao
-    public static void main(String[] args) {
-        new BuilderMaster().gerarCodigoClasse(Locacao.class);
+    // public static void main(String[] args) {
+    // new BuilderMaster().gerarCodigoClasse(Locacao.class);
+    // }
+
+    @Test
+    public void naoDeveAlugarFilmeParaUsuarioDevedor() throws FilmesSemEstoqueException, LocadoraException {
+
+        // cenario
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
+        List<Filme> filmes = Arrays.asList(FilmeBuilder.umFilme().agora());
+        Mockito.when(spc.possuiSaldoNegativo(usuario)).thenReturn(true);
+
+        exception.expect(LocadoraException.class);
+        exception.expectMessage("Usuário devedor");
+
+        // ação
+        service.alugarFilme(usuario, filmes);
     }
 
 }
