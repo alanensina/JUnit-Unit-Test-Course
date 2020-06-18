@@ -14,6 +14,7 @@ import aensina.entidades.Locacao;
 import aensina.entidades.Usuario;
 import aensina.exceptions.FilmesSemEstoqueException;
 import aensina.exceptions.LocadoraException;
+import aensina.interfaces.EmailService;
 import aensina.interfaces.SPCInterface;
 import aensina.utils.DataUtils;
 
@@ -26,6 +27,7 @@ public class LocacaoService {
 
     private LocacaoDAO dao;
     private SPCInterface spc;
+    private EmailService es;
 
     public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws FilmesSemEstoqueException, LocadoraException {
 
@@ -110,11 +112,23 @@ public class LocacaoService {
         return Double.parseDouble(bd.toString());
     }
 
+    public void notificarAtrasos() {
+        List<Locacao> locacoes = dao.obterLocacoesPendentes();
+
+        for (Locacao loc : locacoes) {
+            es.notificarAtraso(loc.getUsuario());
+        }
+    }
+
     public void setLocacaoDAO(LocacaoDAO dao) {
         this.dao = dao;
     }
 
     public void setSPC(SPCInterface spc) {
         this.spc = spc;
+    }
+
+    public void setEs(EmailService es) {
+        this.es = es;
     }
 }

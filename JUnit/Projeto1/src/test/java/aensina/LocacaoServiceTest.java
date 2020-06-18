@@ -30,10 +30,12 @@ import aensina.entidades.Locacao;
 import aensina.entidades.Usuario;
 import aensina.exceptions.FilmesSemEstoqueException;
 import aensina.exceptions.LocadoraException;
+import aensina.interfaces.EmailService;
 import aensina.interfaces.SPCInterface;
 import aensina.servicos.LocacaoService;
 import aensina.utils.DataUtils;
 import builders.FilmeBuilder;
+import builders.LocacaoBuilder;
 import builders.UsuarioBuilder;
 import matchers.MatchersProperties;
 
@@ -42,7 +44,8 @@ public class LocacaoServiceTest {
     private LocacaoService service;
     private List<Filme> filmes;
     private SPCInterface spc;
-    // private static int contadorDeTestes = 0;
+    private LocacaoDAO dao;
+    private EmailService es;
 
     @Rule
     public ErrorCollector error = new ErrorCollector();
@@ -55,14 +58,13 @@ public class LocacaoServiceTest {
     public void setup() {
         service = new LocacaoService();
         filmes = new ArrayList<Filme>();
-        // System.out.println("Before");
-        // contadorDeTestes++;
-        // System.out.println("Contador: " + contadorDeTestes);
-        LocacaoDAO dao = Mockito.mock(LocacaoDAO.class);
-        service.setLocacaoDAO(dao);
-
+        dao = Mockito.mock(LocacaoDAO.class);
+        es = Mockito.mock(EmailService.class);
         spc = Mockito.mock(SPCInterface.class);
+
+        service.setLocacaoDAO(dao);
         service.setSPC(spc);
+        service.setEs(es);
     }
 
     @After
@@ -213,18 +215,42 @@ public class LocacaoServiceTest {
     // }
 
     @Test
-    public void naoDeveAlugarFilmeParaUsuarioDevedor() throws FilmesSemEstoqueException, LocadoraException {
+    public void naoDeveAlugarFilmeParaUsuarioDevedor() throws FilmesSemEstoqueException {
 
         // cenario
         Usuario usuario = UsuarioBuilder.umUsuario().agora();
         List<Filme> filmes = Arrays.asList(FilmeBuilder.umFilme().agora());
         Mockito.when(spc.possuiSaldoNegativo(usuario)).thenReturn(true);
 
-        exception.expect(LocadoraException.class);
-        exception.expectMessage("Usuário devedor");
+        // ação
+        try {
+            service.alugarFilme(usuario, filmes);
+            Assert.fail();
+        } catch (LocadoraException e) {
+            Assert.assertThat(e.getMessage(), CoreMatchers.is("Usuário devedor"));
+        }
+
+        Mockito.verify(spc).possuiSaldoNegativo(usuario);
+    }
+
+    @Test
+    public void deveEnviarEmailParaLocacaoAtrasada() {
+        // cenário
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
+        List<Locacao> locacoes = Arrays.asList(
+                LocacaoBuilder
+                        .umLocacao()
+                        .comUsuario(usuario)
+                        .comDataRetorno(DataUtils.obterDataComDiferencaDias(-2))
+                        .agora());
+
+        Mockito.when(dao.obterLocacoesPendentes()).thenReturn(locacoes);
 
         // ação
-        service.alugarFilme(usuario, filmes);
+        service.notificarAtrasos();
+
+        // verificação
+        Mockito.verify(es).notificarAtraso(usuario);
     }
 
 }
