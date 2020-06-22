@@ -21,6 +21,8 @@ import aensina.entidades.Locacao;
 import aensina.entidades.Usuario;
 import aensina.exceptions.FilmesSemEstoqueException;
 import aensina.exceptions.LocadoraException;
+import aensina.interfaces.EmailService;
+import aensina.interfaces.SPCInterface;
 import aensina.servicos.LocacaoService;
 import builders.FilmeBuilder;
 
@@ -28,6 +30,9 @@ import builders.FilmeBuilder;
 public class CalculoValorLocacaoTest {
 
     private LocacaoService service;
+    private SPCInterface spc;
+    private LocacaoDAO dao;
+    private EmailService es;
 
     private static Filme filme1 = FilmeBuilder.umFilme().agora();
     private static Filme filme2 = FilmeBuilder.umFilme().agora();
@@ -61,8 +66,12 @@ public class CalculoValorLocacaoTest {
     @Before
     public void setup() {
         service = new LocacaoService();
-        LocacaoDAO dao = Mockito.mock(LocacaoDAO.class);
+        dao = Mockito.mock(LocacaoDAO.class);
+        es = Mockito.mock(EmailService.class);
+        spc = Mockito.mock(SPCInterface.class);
         service.setLocacaoDAO(dao);
+        service.setSPC(spc);
+        service.setEs(es);
     }
 
     @Test
