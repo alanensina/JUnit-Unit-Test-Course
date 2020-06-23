@@ -22,7 +22,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import aensina.dao.LocacaoDAO;
 import aensina.entidades.Filme;
@@ -41,10 +44,16 @@ import matchers.MatchersProperties;
 
 public class LocacaoServiceTest {
 
+	@InjectMocks
     private LocacaoService service;
-    private List<Filme> filmes;
+	
+    private List<Filme> filmes = new ArrayList<Filme>(5);
+    
+    @Mock
     private SPCInterface spc;
+    @Mock
     private LocacaoDAO dao;
+    @Mock
     private EmailService es;
 
     @Rule
@@ -56,15 +65,7 @@ public class LocacaoServiceTest {
 
     @Before
     public void setup() {
-        service = new LocacaoService();
-        filmes = new ArrayList<Filme>();
-        dao = Mockito.mock(LocacaoDAO.class);
-        es = Mockito.mock(EmailService.class);
-        spc = Mockito.mock(SPCInterface.class);
-
-        service.setLocacaoDAO(dao);
-        service.setSPC(spc);
-        service.setEs(es);
+    	MockitoAnnotations.initMocks(this);
     }
 
     @After
