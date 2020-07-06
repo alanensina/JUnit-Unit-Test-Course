@@ -30,6 +30,7 @@ public class LocacaoService {
     private EmailService es;
 
     public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws FilmesSemEstoqueException, LocadoraException {
+        boolean negativado;
 
         if (usuario == null) {
             throw new LocadoraException("Usuário vazio");
@@ -39,7 +40,13 @@ public class LocacaoService {
             throw new LocadoraException("Filme vazio");
         }
 
-        else if (spc.possuiSaldoNegativo(usuario)) {
+        try {
+            negativado = spc.possuiSaldoNegativo(usuario);
+        } catch (Exception e) {
+            throw new LocadoraException("Problemas com o SPC, tente novamente mais tarde!");
+        }
+
+        if (negativado) {
             throw new LocadoraException("Usuário devedor");
         }
 
@@ -116,9 +123,9 @@ public class LocacaoService {
         List<Locacao> locacoes = dao.obterLocacoesPendentes();
 
         for (Locacao loc : locacoes) {
-        	if(loc.getDataRetorno().before(new Date())) {
-        		es.notificarAtraso(loc.getUsuario());
-        	}
+            if (loc.getDataRetorno().before(new Date())) {
+                es.notificarAtraso(loc.getUsuario());
+            }
         }
     }
 }

@@ -44,11 +44,11 @@ import matchers.MatchersProperties;
 
 public class LocacaoServiceTest {
 
-	@InjectMocks
+    @InjectMocks
     private LocacaoService service;
-	
+
     private List<Filme> filmes = new ArrayList<Filme>(5);
-    
+
     @Mock
     private SPCInterface spc;
     @Mock
@@ -65,7 +65,7 @@ public class LocacaoServiceTest {
 
     @Before
     public void setup() {
-    	MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.initMocks(this);
     }
 
     @After
@@ -216,7 +216,7 @@ public class LocacaoServiceTest {
     // }
 
     @Test
-    public void naoDeveAlugarFilmeParaUsuarioDevedor() throws FilmesSemEstoqueException {
+    public void naoDeveAlugarFilmeParaUsuarioDevedor() throws Exception {
 
         // cenario
         Usuario usuario = UsuarioBuilder.umUsuario().agora();
@@ -254,6 +254,23 @@ public class LocacaoServiceTest {
         Mockito.verify(es).notificarAtraso(usuario1);
         Mockito.verify(es, Mockito.never()).notificarAtraso(usuario2);
         Mockito.verify(es).notificarAtraso(usuario3);
+    }
+
+    @Test
+    public void deveTratarErroNoSPC() throws Exception {
+        // cenário
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
+        List<Filme> filmes = Arrays.asList(FilmeBuilder.umFilme().agora());
+
+        Mockito.when(spc.possuiSaldoNegativo(usuario)).thenThrow(new RuntimeException("Falha catastrófica"));
+
+        exception.expect(LocadoraException.class);
+        exception.expectMessage("Problemas com o SPC, tente novamente mais tarde!");
+
+        // ação
+        service.alugarFilme(usuario, filmes);
+
+        // verificação
     }
 
 }

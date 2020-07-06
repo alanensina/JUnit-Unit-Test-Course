@@ -4,6 +4,6 @@ import aensina.entidades.Usuario;
 
 public interface SPCInterface {
 
-    public boolean possuiSaldoNegativo(Usuario usuario);
+    public boolean possuiSaldoNegativo(Usuario usuario) throws Exception;
 
 }
