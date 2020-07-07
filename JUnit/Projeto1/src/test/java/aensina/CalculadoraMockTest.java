@@ -1,11 +1,44 @@
 package aensina;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
+import aensina.interfaces.EmailService;
 import aensina.servicos.CalculadoraService;
 
 public class CalculadoraMockTest {
+
+    @Mock
+    private CalculadoraService calcMock;
+
+    @Spy
+    private CalculadoraService calcSpy;
+
+    // @Spy - Só funciona para classes concretas e não para interfaces
+    @Mock
+    private EmailService emailSpy;
+
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    public void deveMostrarADiferencaEntreMockESpy() {
+        System.out.println("Caso em que ele sabe o esperado:");
+        Mockito.when(calcMock.somar(1, 2)).thenReturn(8);
+        System.out.println("Mock: " + calcMock.somar(1, 2));
+        Mockito.when(calcSpy.somar(1, 2)).thenReturn(8);
+        System.out.println("Spy: " + calcSpy.somar(1, 2));
+
+        System.out.println("Caso em que ele não sabe o esperado:");
+        System.out.println("Mock: " + calcMock.somar(2, 2)); // retorna o valor padrão que é zero
+        System.out.println("Spy: " + calcSpy.somar(2, 2)); // retorna o valor real da função
+    }
 
     @Test
     public void testeDeMockitoMatchers() {
