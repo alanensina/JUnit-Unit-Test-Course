@@ -32,12 +32,24 @@ public class CalculadoraMockTest {
         System.out.println("Caso em que ele sabe o esperado:");
         Mockito.when(calcMock.somar(1, 2)).thenReturn(8);
         System.out.println("Mock: " + calcMock.somar(1, 2));
-        Mockito.when(calcSpy.somar(1, 2)).thenReturn(8);
+        // Mockito.when(calcSpy.somar(1, 2)).thenReturn(8); // O sysout dentro do método somar é executado no momento da gravação da expectativa
+        Mockito.doReturn(8).when(calcSpy).somar(1, 2); // Nesse caso o sysout nao é executado
         System.out.println("Spy: " + calcSpy.somar(1, 2));
 
         System.out.println("Caso em que ele não sabe o esperado:");
         System.out.println("Mock: " + calcMock.somar(2, 2)); // retorna o valor padrão que é zero
         System.out.println("Spy: " + calcSpy.somar(2, 2)); // retorna o valor real da função
+
+        System.out.println("Mock: ");
+        calcMock.imprime();
+
+        System.out.println("Spy: ");
+        calcSpy.imprime();
+
+        Mockito.doNothing().when(calcSpy).imprime();
+        System.out.println("Spy: ");
+        calcSpy.imprime();
+
     }
 
     @Test
@@ -52,7 +64,6 @@ public class CalculadoraMockTest {
         // No caso abaixo, você pode restringir os parâmetros para que sempre que o primeiro elemento for 5 e subtraido de qualquer inteiro, retorne 2
         Mockito.when(calcService.subtrair(Mockito.eq(5), Mockito.anyInt())).thenReturn(2);
         System.out.println(calcService.subtrair(5, 8));
-
     }
 
 }
